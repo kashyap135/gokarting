@@ -9,20 +9,20 @@ import heroImage from "@/assets/hero-kart.jpg";
 const licenseTypes = [
   {
     name: "Beginner",
-    price: "$49",
+    price: "₹349",
     color: "bg-racing-green",
     features: ["Basic track access", "Weekend racing", "Safety certification", "1 year validity"],
   },
   {
     name: "Pro",
-    price: "$149",
+    price: "₹400",
     color: "bg-racing-orange",
     popular: true,
     features: ["All tracks access", "Competition eligible", "Priority booking", "2 year validity"],
   },
   {
     name: "Championship",
-    price: "$299",
+    price: "₹799",
     color: "bg-racing-gold",
     features: ["Championship events", "International validity", "VIP track access", "3 year validity"],
   },
