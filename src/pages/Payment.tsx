@@ -13,7 +13,7 @@ export default function Payment() {
   const navigate = useNavigate();
   const [registrationData, setRegistrationData] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [countdown, setCountdown] = useState(180); // 3 minutes in seconds
+  const [countdown, setCountdown] = useState(135); // 2 minutes 15 seconds in seconds
   const [canConfirm, setCanConfirm] = useState(false);
 
   useEffect(() => {
@@ -140,8 +140,9 @@ export default function Payment() {
             <Card className="shadow-lg mb-6">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  {/* QR Code */}
+                  {/* QR Code - Replace with custom image */}
                   <div className="bg-white p-6 rounded-xl inline-block mb-4 shadow-inner">
+                    {/* TODO: Replace with custom QR image once provided */}
                     <QRCodeSVG
                       value={upiPaymentString}
                       size={200}
@@ -167,15 +168,7 @@ export default function Payment() {
                     </ol>
                   </div>
 
-                  {/* Countdown Timer */}
-                  {!canConfirm && (
-                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
-                      <Clock className="w-4 h-4 animate-pulse" />
-                      <span>
-                        Button will be enabled in <span className="font-mono font-bold text-foreground">{formatTime(countdown)}</span>
-                      </span>
-                    </div>
-                  )}
+                  {/* Countdown runs in background - no visible timer */}
 
                   {/* Confirm Payment Button */}
                   <Button
