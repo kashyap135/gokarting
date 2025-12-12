@@ -150,9 +150,7 @@ export default function Payment() {
                     />
                   </div>
                   
-                  <p className="text-xs text-muted-foreground mb-2">
-                    UPI ID: kavyasudhareddy2005@okhdfcbank
-                  </p>
+                 
 
                   <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
                     <Smartphone className="w-4 h-4" />
@@ -167,7 +165,7 @@ export default function Payment() {
                       <li>Scan the QR code above</li>
                       <li>Verify the amount (₹{registrationData.price})</li>
                       <li>Complete the payment</li>
-                      <li>Click "I've Completed Payment" below</li>
+                     
                     </ol>
                   </div>
 
