@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { QrCode, Shield, Lock, ArrowLeft, CheckCircle, Clock, Smartphone } from "lucide-react";
 import { toast } from "sonner";
-import { QRCodeSVG } from "qrcode.react";
+import paymentQr from "@/assets/payment-qr.jpeg";
 
 export default function Payment() {
   const navigate = useNavigate();
@@ -140,14 +140,12 @@ export default function Payment() {
             <Card className="shadow-lg mb-6">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  {/* QR Code - Replace with custom image */}
-                  <div className="bg-white p-6 rounded-xl inline-block mb-4 shadow-inner">
-                    {/* TODO: Replace with custom QR image once provided */}
-                    <QRCodeSVG
-                      value={upiPaymentString}
-                      size={200}
-                      level="H"
-                      includeMargin={false}
+                  {/* Custom UPI QR Code */}
+                  <div className="bg-white p-4 rounded-xl inline-block mb-4 shadow-inner">
+                    <img 
+                      src={paymentQr} 
+                      alt="UPI Payment QR Code" 
+                      className="w-[220px] h-auto rounded-lg"
                     />
                   </div>
 
