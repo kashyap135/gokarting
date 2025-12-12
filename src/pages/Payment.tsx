@@ -5,13 +5,16 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { CreditCard, Shield, Lock, ArrowLeft, CheckCircle } from "lucide-react";
+import { QrCode, Shield, Lock, ArrowLeft, CheckCircle, Clock, Smartphone } from "lucide-react";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function Payment() {
   const navigate = useNavigate();
   const [registrationData, setRegistrationData] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [countdown, setCountdown] = useState(180); // 3 minutes in seconds
+  const [canConfirm, setCanConfirm] = useState(false);
 
   useEffect(() => {
     const data = sessionStorage.getItem("registrationData");
@@ -23,17 +26,37 @@ export default function Payment() {
     setRegistrationData(JSON.parse(data));
   }, [navigate]);
 
-  const handlePayment = () => {
+  // Countdown timer
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setCanConfirm(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const handleConfirmPayment = () => {
     setIsProcessing(true);
 
-    // Simulate payment processing
+    // Process payment confirmation
     setTimeout(() => {
-      // Generate transaction details
       const transactionId = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
       const licenseId = `GKL-${new Date().getFullYear()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
       const paymentDate = new Date().toISOString();
 
-      // Store payment success data
       sessionStorage.setItem("paymentData", JSON.stringify({
         ...registrationData,
         transactionId,
@@ -43,14 +66,17 @@ export default function Payment() {
         expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000 * 2).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
       }));
 
-      toast.success("Payment successful!");
+      toast.success("Payment confirmed!");
       navigate("/payment-success");
-    }, 2000);
+    }, 1500);
   };
 
   if (!registrationData) {
     return null;
   }
+
+  // Generate a unique UPI payment string for QR code
+  const upiPaymentString = `upi://pay?pa=gokartlicense@upi&pn=GoKart%20Authority&am=${registrationData.price}&cu=INR&tn=License%20Fee%20for%20${registrationData.fullName}`;
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
@@ -73,11 +99,11 @@ export default function Payment() {
 
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-racing-orange rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <CreditCard className="w-8 h-8 text-primary-foreground" />
+                <QrCode className="w-8 h-8 text-primary-foreground" />
               </div>
-              <h1 className="text-3xl font-bold mb-2">Complete Payment</h1>
+              <h1 className="text-3xl font-bold mb-2">Scan & Pay</h1>
               <p className="text-muted-foreground">
-                Secure payment for your GoKart license.
+                Scan the QR code below to complete your payment.
               </p>
             </div>
 
@@ -100,77 +126,94 @@ export default function Payment() {
                   <span className="font-medium">{registrationData.licenseName}</span>
                 </div>
                 <div className="border-t pt-4">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span>${registrationData.price}.00</span>
-                  </div>
-                  <div className="flex justify-between mt-2">
-                    <span className="text-muted-foreground">Processing Fee</span>
-                    <span>$0.00</span>
-                  </div>
-                </div>
-                <div className="border-t pt-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold">Total</span>
+                    <span className="text-lg font-bold">Total Amount</span>
                     <span className="text-2xl font-bold text-racing-orange">
-                      ${registrationData.price}.00
+                      ₹{registrationData.price}
                     </span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Payment Button */}
-            <Card className="shadow-lg">
+            {/* QR Code Payment Section */}
+            <Card className="shadow-lg mb-6">
               <CardContent className="pt-6">
-                <div className="flex items-center gap-3 mb-6 p-3 bg-muted/50 rounded-lg">
-                  <Shield className="w-5 h-5 text-racing-green" />
-                  <span className="text-sm text-muted-foreground">
-                    Your payment is secured with 256-bit SSL encryption
-                  </span>
-                </div>
+                <div className="text-center">
+                  {/* QR Code */}
+                  <div className="bg-white p-6 rounded-xl inline-block mb-4 shadow-inner">
+                    <QRCodeSVG
+                      value={upiPaymentString}
+                      size={200}
+                      level="H"
+                      includeMargin={false}
+                    />
+                  </div>
 
-                <Button
-                  variant="racing"
-                  size="lg"
-                  className="w-full"
-                  onClick={handlePayment}
-                  disabled={isProcessing}
-                >
-                  {isProcessing ? (
-                    <span className="flex items-center gap-2">
-                      <span className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                      Processing Payment...
-                    </span>
-                  ) : (
-                    <>
-                      <Lock className="w-5 h-5" />
-                      Pay ${registrationData.price}.00
-                    </>
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
+                    <Smartphone className="w-4 h-4" />
+                    <span>Scan with any UPI app (GPay, PhonePe, Paytm, etc.)</span>
+                  </div>
+
+                  {/* Payment Instructions */}
+                  <div className="bg-muted/50 rounded-lg p-4 text-left mb-6">
+                    <h3 className="font-semibold mb-2 text-sm">How to Pay:</h3>
+                    <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                      <li>Open any UPI payment app on your phone</li>
+                      <li>Scan the QR code above</li>
+                      <li>Verify the amount (₹{registrationData.price})</li>
+                      <li>Complete the payment</li>
+                      <li>Click "I've Completed Payment" below</li>
+                    </ol>
+                  </div>
+
+                  {/* Countdown Timer */}
+                  {!canConfirm && (
+                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
+                      <Clock className="w-4 h-4 animate-pulse" />
+                      <span>
+                        Button will be enabled in <span className="font-mono font-bold text-foreground">{formatTime(countdown)}</span>
+                      </span>
+                    </div>
                   )}
-                </Button>
 
-                <div className="flex items-center justify-center gap-4 mt-6">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png"
-                    alt="Visa"
-                    className="h-6 opacity-60"
-                  />
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/200px-Mastercard-logo.svg.png"
-                    alt="Mastercard"
-                    className="h-8 opacity-60"
-                  />
+                  {/* Confirm Payment Button */}
+                  <Button
+                    variant="racing"
+                    size="lg"
+                    className="w-full"
+                    onClick={handleConfirmPayment}
+                    disabled={!canConfirm || isProcessing}
+                  >
+                    {isProcessing ? (
+                      <span className="flex items-center gap-2">
+                        <span className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                        Verifying Payment...
+                      </span>
+                    ) : canConfirm ? (
+                      <>
+                        <CheckCircle className="w-5 h-5" />
+                        I've Completed Payment
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-5 h-5" />
+                        Please Wait...
+                      </>
+                    )}
+                  </Button>
+
+                  {canConfirm && (
+                    <p className="text-xs text-muted-foreground mt-3">
+                      Only click after you've successfully completed the UPI payment
+                    </p>
+                  )}
                 </div>
-
-                <p className="text-center text-xs text-muted-foreground mt-4">
-                  By proceeding, you agree to our Terms of Service and Privacy Policy.
-                </p>
               </CardContent>
             </Card>
 
             {/* Security Features */}
-            <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="grid grid-cols-3 gap-4">
               {[
                 { icon: Shield, label: "Secure Payment" },
                 { icon: Lock, label: "Data Protected" },
