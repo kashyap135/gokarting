@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { QrCode, Shield, Lock, ArrowLeft, CheckCircle, Clock, Smartphone } from "lucide-react";
 import { toast } from "sonner";
-import paymentQr from "@/assets/payment-qr.jpeg";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function Payment() {
   const navigate = useNavigate();
@@ -75,8 +75,8 @@ export default function Payment() {
     return null;
   }
 
-  // Generate a unique UPI payment string for QR code
-  const upiPaymentString = `upi://pay?pa=gokartlicense@upi&pn=GoKart%20Authority&am=${registrationData.price}&cu=INR&tn=License%20Fee%20for%20${registrationData.fullName}`;
+  // Generate UPI payment string with your actual UPI ID and dynamic amount
+  const upiPaymentString = `upi://pay?pa=kavyasudhareddy2005@okhdfcbank&pn=Kavya%20Sudha&am=${registrationData.price}&cu=INR&tn=GoKart%20License%20Fee`;
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
@@ -140,14 +140,19 @@ export default function Payment() {
             <Card className="shadow-lg mb-6">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  {/* Custom UPI QR Code */}
-                  <div className="bg-white p-4 rounded-xl inline-block mb-4 shadow-inner">
-                    <img 
-                      src={paymentQr} 
-                      alt="UPI Payment QR Code" 
-                      className="w-[220px] h-auto rounded-lg"
+                  {/* Dynamic UPI QR Code with amount pre-filled */}
+                  <div className="bg-white p-6 rounded-xl inline-block mb-4 shadow-inner">
+                    <QRCodeSVG
+                      value={upiPaymentString}
+                      size={200}
+                      level="H"
+                      includeMargin={false}
                     />
                   </div>
+                  
+                  <p className="text-xs text-muted-foreground mb-2">
+                    UPI ID: kavyasudhareddy2005@okhdfcbank
+                  </p>
 
                   <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4">
                     <Smartphone className="w-4 h-4" />
