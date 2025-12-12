@@ -12,9 +12,9 @@ import { Flag, CheckCircle, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 const licenseTypes = [
-  { id: "beginner", name: "Beginner License", price: 49, color: "border-racing-green" },
-  { id: "pro", name: "Pro License", price: 149, color: "border-racing-orange" },
-  { id: "championship", name: "Championship License", price: 299, color: "border-racing-gold" },
+  { id: "beginner", name: "Beginner License", price: 349, color: "border-racing-green" },
+  { id: "pro", name: "Pro License", price: 400, color: "border-racing-orange" },
+  { id: "championship", name: "Championship License", price: 799, color: "border-racing-gold" },
 ];
 
 export default function Register() {
@@ -195,7 +195,7 @@ export default function Register() {
                               </div>
                               <span className="font-medium">{license.name}</span>
                             </div>
-                            <span className="font-bold text-lg">${license.price}</span>
+                            <span className="font-bold text-lg">₹{license.price}</span>
                           </Label>
                         </div>
                       ))}
@@ -210,7 +210,7 @@ export default function Register() {
                     </div>
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-muted-foreground">Total Amount:</span>
-                      <span className="font-bold text-xl text-racing-orange">${selectedLicense?.price}</span>
+                      <span className="font-bold text-xl text-racing-orange">₹{selectedLicense?.price}</span>
                     </div>
                   </div>
 
