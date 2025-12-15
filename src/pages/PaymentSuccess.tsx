@@ -104,7 +104,7 @@ export default function PaymentSuccess() {
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-muted-foreground">Amount Paid</span>
-                    <span className="font-bold">${paymentData.price}.00</span>
+                    <span className="font-bold">₹{paymentData.price}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-muted-foreground">License Type</span>
