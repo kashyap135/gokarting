@@ -20,6 +20,8 @@ const licenseTypes = [
 export default function Register() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [ageError, setAgeError] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -30,12 +32,64 @@ export default function Register() {
     licenseType: "pro",
   });
 
+  const validateAge = (dob: string) => {
+    if (!dob) return true;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    if (age < 18) {
+      setAgeError("You must be at least 18 years old to register");
+      return false;
+    }
+    setAgeError("");
+    return true;
+  };
+
+  const validatePassword = (password: string) => {
+    const errors: string[] = [];
+    if (password.length < 8) errors.push("At least 8 characters");
+    if (!/[A-Z]/.test(password)) errors.push("One uppercase letter");
+    if (!/[a-z]/.test(password)) errors.push("One lowercase letter");
+    if (!/[0-9]/.test(password)) errors.push("One number");
+    if (!/[!@#$%^&*]/.test(password)) errors.push("One special character (!@#$%^&*)");
+    setPasswordErrors(errors);
+    return errors.length === 0;
+  };
+
+  const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dob = e.target.value;
+    setFormData({ ...formData, dateOfBirth: dob });
+    validateAge(dob);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const password = e.target.value;
+    setFormData({ ...formData, password });
+    validatePassword(password);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate form
     if (!formData.fullName || !formData.email || !formData.password || !formData.dateOfBirth) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    // Validate age
+    if (!validateAge(formData.dateOfBirth)) {
+      toast.error("You must be at least 18 years old");
+      return;
+    }
+
+    // Validate password
+    if (!validatePassword(formData.password)) {
+      toast.error("Password does not meet requirements");
       return;
     }
 
@@ -121,14 +175,18 @@ export default function Register() {
 
                   {/* Date of Birth */}
                   <div className="space-y-2">
-                    <Label htmlFor="dob">Date of Birth *</Label>
+                    <Label htmlFor="dob">Date of Birth * <span className="text-xs text-muted-foreground">(Must be 18+)</span></Label>
                     <Input
                       id="dob"
                       type="date"
                       value={formData.dateOfBirth}
-                      onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                      onChange={handleDobChange}
                       required
+                      className={ageError ? "border-destructive" : ""}
                     />
+                    {ageError && (
+                      <p className="text-sm text-destructive">{ageError}</p>
+                    )}
                   </div>
 
                   {/* Address */}
@@ -151,8 +209,9 @@ export default function Register() {
                         type={showPassword ? "text" : "password"}
                         placeholder="Create a secure password"
                         value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        onChange={handlePasswordChange}
                         required
+                        className={passwordErrors.length > 0 && formData.password ? "border-destructive" : ""}
                       />
                       <button
                         type="button"
@@ -162,6 +221,18 @@ export default function Register() {
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
                     </div>
+                    {formData.password && (
+                      <div className="text-xs space-y-1">
+                        <p className="text-muted-foreground">Password must have:</p>
+                        <ul className="grid grid-cols-2 gap-1">
+                          {["At least 8 characters", "One uppercase letter", "One lowercase letter", "One number", "One special character (!@#$%^&*)"].map((rule) => (
+                            <li key={rule} className={`flex items-center gap-1 ${passwordErrors.includes(rule) ? "text-destructive" : "text-racing-green"}`}>
+                              {passwordErrors.includes(rule) ? "✗" : "✓"} {rule}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
 
                   {/* License Type Selection */}
