@@ -122,15 +122,15 @@ export default function Receipt() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">License Fee</span>
-                      <span>${paymentData.price}.00</span>
+                      <span>₹{paymentData.price}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Processing Fee</span>
-                      <span>$0.00</span>
+                      <span>₹0</span>
                     </div>
                     <div className="flex justify-between border-t pt-2 mt-2">
                       <span className="font-bold">Total Paid</span>
-                      <span className="font-bold text-lg text-racing-orange">${paymentData.price}.00</span>
+                      <span className="font-bold text-lg text-racing-orange">₹{paymentData.price}</span>
                     </div>
                   </div>
                 </div>
